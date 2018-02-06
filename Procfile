@@ -1,1 +1,1 @@
-web: gunicorn cryptoDashboard.wsgi --log-file -
+web: gunicorn cryptoDashboard.wsgi
