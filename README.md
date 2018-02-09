@@ -13,14 +13,28 @@ As per the description of the Coding Challenge (Advanced) we have to build a cry
 Build locally in Ubuntu.
 
 ```
-mkdir cryptoDashboardServer
-cd cryptoDashboardServer
-git clone https://github.com/kdpisda/trackCryptoCurrencyPrices.git cryptoDashboard
-python3 -m venv env
-source env/bin/activate
-cd cryptoDashboard
-pip install -r requirements.txt
-./manage.py runserver
+$ mkdir cryptoDashboardServer
+$ cd cryptoDashboardServer
+$ git clone https://github.com/kdpisda/trackCryptoCurrencyPrices.git cryptoDashboard
+$ python3 -m venv env
+$ source env/bin/activate
+$ cd cryptoDashboard
+```
+Now make a file `.env` and update your credentials for the facebook and github client ID and secret
+```
+SECRET_KEY=)$8z^+6ys%vd6b2u_r)zf7q(c*g=xd_7x&&$@euxends*i&^=%
+DEBUG=True
+DB_NAME=cryptoDashboardDB
+DB_USER=web
+DB_PASSWORD=hA8(scA@!fg3*sc&xaGh&6%-l<._&xCf
+DB_HOST=127.0.0.1
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+```
+Then run following commands in terminal
+```
+$ pip install -r requirements.txt
+$ ./manage.py runserver
 ```
 
 Now open browser and enter `127.0.0.1:8000`.
