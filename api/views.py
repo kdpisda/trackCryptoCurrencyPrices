@@ -17,25 +17,25 @@ def get_live_price(request):
 		temp_co_ordinates = temp_currency_price.last_tracked_price
 		time_slab.append(str(temp_currency_price.recorded_time.strftime("%d/%m/%y %H:%M")))
 		co_ordinates.append(temp_co_ordinates)
-	price_history['BTC'] = co_ordinates
+	price_history['BTC'] = co_ordinates[-20:]
 	co_ordinates = []
 	
 	temp_currency_prices = CurrencyPrices.objects.filter(currency="ETH")
 	for temp_currency_price in temp_currency_prices:
 		temp_co_ordinates = temp_currency_price.last_tracked_price
 		co_ordinates.append(temp_co_ordinates)
-	price_history['ETH'] = co_ordinates
+	price_history['ETH'] = co_ordinates[-20:]
 	co_ordinates = []
 	
 	temp_currency_prices = CurrencyPrices.objects.filter(currency="LTC")
 	for temp_currency_price in temp_currency_prices:
 		temp_co_ordinates = temp_currency_price.last_tracked_price
 		co_ordinates.append(temp_co_ordinates)
-	price_history['LTC'] = co_ordinates
+	price_history['LTC'] = co_ordinates[-20:]
 
 	response['success'] = True
 	response['price'] = price_history
-	response['time'] = time_slab
+	response['time'] = time_slab[-20:]
 	return JsonResponse(response)
 
 def get_current_price(request):

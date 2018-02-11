@@ -6,10 +6,41 @@
 		<canvas id="live_price_chart"></canvas>
 	</div>
     <div class="col l4 m4 s12">
-        <div class="card blue-grey darken-1">
-            <div class="card-content white-text">
+        <div class="card">
+            <div class="card-content">
                 <span class="card-title">Notify me</span>
-                <p id="updateme">When prices are up</p>
+                <div class="row">
+                    <div class="input-field col s6 m6 l6 white-text">
+                        <select>
+                            <option value="" disabled selected>Choose your currency</option>
+                            <option value="BTC">BitCoin</option>
+                            <option value="ETH">Ethereum</option>
+                            <option value="LTC">LiteCoin</option>
+                        </select>
+                        <label>Select required currency</label>
+                    </div>
+                    <div class="input-field col s6 m6 l6">
+                        <select>
+                            <option value="" disabled selected>Choose your option</option>
+                            <option value="UP">Greater than</option>
+                            <option value="DN">Less than</option>
+                        </select>
+                        <label>On</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s6 m6 l6">
+                        <input id="amount_text_box" type="text" class="validate">
+                        <label for="amount_text_box">Amount</label>
+                    </div>
+                    <div class="col s3 m3 l3">
+                        <a class="btn-floating btn-large waves-effect waves-light blue-grey darken-1"><i class="material-icons">add</i></a>
+                    </div>
+                    <div class="col s3 m3 l3">
+                        <button class="btn-floating btn-large waves-effect waves-light blue-grey darken-1" id="updateme"><i class="material-icons">refresh</i></button>
+                    </div>
+                </div>
+                <br>
             </div>
         </div>
         <br>
@@ -39,6 +70,16 @@
     var TimeStamps = [];
     var last_updated_time;
     $(document).ready(function(){
+        
+        function remove_data(chart) {
+            chart.data.labels.pop();
+            // chart.data.datasets.forEach((dataset) => {
+            //     dataset.data.pop();
+            // });
+            chart.data.datasets.splice(0, 1);
+            chart.update();
+        }
+        
         function add_data(chart, time_stamp, prices) {
             var i = 0;
             chart = window.myLine;
@@ -48,6 +89,7 @@
                 i = i+1;
             });
             chart.update();
+            // remove_data(chart);
         }
 
         $.get('/api/v1/get_price', function(data){
@@ -58,9 +100,9 @@
                 window.LiteCoin = data['price']['LTC'];
                 window.TimeStamps = data['time'];
                 $("#last_updated_time_p").html(data['time'][length-1]);
-                $("#live_btc_price").html("BitCoin - " + BitCoin[length-1] + " ₹");
-                $("#live_eth_price").html("Ethereum - " + Ethereum[length-1] + " ₹");
-                $("#live_ltc_price").html("LiteCoin - " + LiteCoin[length-1] + " ₹");
+                $("#live_btc_price").html("1 BitCoin = " + BitCoin[length-1] + " ₹");
+                $("#live_eth_price").html("1 Ethereum = " + Ethereum[length-1] + " ₹");
+                $("#live_ltc_price").html("1 LiteCoin = " + LiteCoin[length-1] + " ₹");
                 window.config = {
                     type: 'line',
                     data: {
@@ -125,7 +167,7 @@
                 //     window.myLine = new Chart(ctx, config);
                 // };
             }else{
-                Materialize.toast(data.message, 4000);
+                M.toast({html: data.message}, 4000);
             }
         });
 
@@ -136,26 +178,29 @@
                     prices[0] = data['data']['BTC'];
                     prices[1] = data['data']['ETH'];
                     prices[2] = data['data']['LTC'];
-                    $("#live_btc_price").html("BitCoin - " + prices[0] + " ₹");
-                    $("#live_eth_price").html("Ethereum - " + prices[1] + " ₹");
-                    $("#live_ltc_price").html("LiteCoin - " + prices[2] + " ₹");
+                    $("#live_btc_price").html("1 BitCoin = " + prices[0] + " ₹");
+                    $("#live_eth_price").html("1 Ethereum = " + prices[1] + " ₹");
+                    $("#live_ltc_price").html("1 LiteCoin = " + prices[2] + " ₹");
                     var last_updated_time = $("#last_updated_time_p").html();
                     if(last_updated_time.localeCompare(data['time'])==0){
-                        alert("Already have the latest");
-                        // Materialize.toast("Already have the latest", 4000);
+                        // alert("Already have the latest");
+                        console.log("Have the latest");
+                        M.toast({html: "Already have the latest"}, 4000);
                     }else{
                         add_data(window.ctx, data['time'], prices);
                         $("#last_updated_time_p").html(data['time']);
                     }
                 }else{
-                    Materialize.toast(data.message, 4000);
+                    M.toast({html: data.message}, 4000);
                 }
             });
         }
 
+        // checking for updates in 1 minute
+        var updateChartFun = setInterval(update_chart, 60000);
+        
         $("#updateme").click(function(){
             update_chart();
-            Materialize.toast("Price Updated", 4000);
         });
     });
     </script>
