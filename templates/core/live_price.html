@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% block title %}Live Prices{% endblock %}
+{% block content %}
+<div class="row">
+	<div class="col l8 m8 s12">
+		<canvas id="live_price_chart"></canvas>
+	</div>
+    <div class="col l4 m4 s12">
+        <div class="card blue-grey darken-1">
+            <div class="card-content white-text">
+                <span class="card-title">Notify me</span>
+                <p id="updateme">When prices are up</p>
+            </div>
+        </div>
+        <br>
+        <div class="card blue-grey darken-1">
+            <div class="card-content white-text">
+                <span class="card-title">Live Prices</span>
+                <ul class="collection black-text">
+                    <li class="collection-item" id="live_btc_price">BitCoin - INR</li>
+                    <li class="collection-item" id="live_eth_price">Ethereum - INR</li>
+                    <li class="collection-item" id="live_ltc_price">LiteCoin - INR</li>
+                </ul>
+                <!-- Last updated -  -->
+                <p id="last_updated_time_p">
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+<!-- <script type="text/javascript" src="http://www.chartjs.org/samples/latest/utils.js"></script> -->
+ <script>
+    var ctx;
+    var config;
+    var BitCoin = [];
+    var Ethereum = [];
+    var LiteCoin = [];
+    var TimeStamps = [];
+    var last_updated_time;
+    $(document).ready(function(){
+        function add_data(chart, time_stamp, prices) {
+            var i = 0;
+            chart = window.myLine;
+            chart.data.labels.push(time_stamp);
+            chart.data.datasets.forEach((dataset) => {
+                dataset.data.push(prices[i]);
+                i = i+1;
+            });
+            chart.update();
+        }
+
+        $.get('/api/v1/get_price', function(data){
+            if(data.success){
+                var length = data['time'].length;
+                window.BitCoin = data['price']['BTC'];
+                window.Ethereum = data['price']['ETH'];
+                window.LiteCoin = data['price']['LTC'];
+                window.TimeStamps = data['time'];
+                $("#last_updated_time_p").html(data['time'][length-1]);
+                $("#live_btc_price").html("BitCoin - " + BitCoin[length-1] + " ₹");
+                $("#live_eth_price").html("Ethereum - " + Ethereum[length-1] + " ₹");
+                $("#live_ltc_price").html("LiteCoin - " + LiteCoin[length-1] + " ₹");
+                window.config = {
+                    type: 'line',
+                    data: {
+                        labels: TimeStamps,
+                        datasets: [{
+                            label: "BitCoin",
+                            backgroundColor: 'rgb(255, 99, 132)',
+                            borderColor: 'rgb(255, 99, 132)',
+                            data: window.BitCoin,
+                            fill: false,
+                        }, {
+                            label: "Ethereum",
+                            fill: false,
+                            backgroundColor: 'rgb(54, 162, 235)',
+                            borderColor: 'rgb(54, 162, 235)',
+                            data: window.Ethereum,
+                        }, {
+                            label: "LiteCoin",
+                            fill: false,
+                            backgroundColor: 'rgb(255, 205, 86)',
+                            borderColor: 'rgb(255, 205, 86)',
+                            data: window.LiteCoin,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        title:{
+                            display:true,
+                            text:'Live Crypto Currency Price (In INR ₹)'
+                        },
+                        tooltips: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        hover: {
+                            mode: 'nearest',
+                            intersect: true
+                        },
+                        scales: {
+                            xAxes: [{
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Time'
+                                }
+                            }],
+                            yAxes: [{
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Price in INR (₹)'
+                                }
+                            }]
+                        }
+                    }
+                };
+                window.ctx = document.getElementById("live_price_chart").getContext("2d");
+                window.myLine = new Chart(window.ctx, window.config);
+                // window.myLine = new Chart(ctx, config);
+                // window.onload = function() {
+                //     var ctx = document.getElementById("live_price_chart").getContext("2d");
+                //     window.myLine = new Chart(ctx, config);
+                // };
+            }else{
+                Materialize.toast(data.message, 4000);
+            }
+        });
+
+        function update_chart(){
+            var prices = [];
+            $.get('/api/v1/get_updated_price', function(data){
+                if(data.success){
+                    prices[0] = data['data']['BTC'];
+                    prices[1] = data['data']['ETH'];
+                    prices[2] = data['data']['LTC'];
+                    $("#live_btc_price").html("BitCoin - " + prices[0] + " ₹");
+                    $("#live_eth_price").html("Ethereum - " + prices[1] + " ₹");
+                    $("#live_ltc_price").html("LiteCoin - " + prices[2] + " ₹");
+                    var last_updated_time = $("#last_updated_time_p").html();
+                    if(last_updated_time.localeCompare(data['time'])==0){
+                        alert("Already have the latest");
+                        // Materialize.toast("Already have the latest", 4000);
+                    }else{
+                        add_data(window.ctx, data['time'], prices);
+                        $("#last_updated_time_p").html(data['time']);
+                    }
+                }else{
+                    Materialize.toast(data.message, 4000);
+                }
+            });
+        }
+
+        $("#updateme").click(function(){
+            update_chart();
+            Materialize.toast("Price Updated", 4000);
+        });
+    });
+    </script>
+{% endblock %}

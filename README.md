@@ -28,8 +28,10 @@ DB_NAME=cryptoDashboardDB
 DB_USER=web
 DB_PASSWORD=hA8(scA@!fg3*sc&xaGh&6%-l<._&xCf
 DB_HOST=127.0.0.1
-GITHUB_CLIENT_ID=
-GITHUB_CLIENT_SECRET=
+GITHUB_CLIENT_ID=******
+GITHUB_CLIENT_SECRET=**********
+FACEBOOK_CLIENT_ID=**************
+FACEBOOK_CLIENT_SECRET=*****************************
 ```
 Then run following commands in terminal
 ```

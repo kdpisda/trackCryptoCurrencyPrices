@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'social_django',
     'profiles',
+    'crypto_currency',
+    'django_cron',
 ]
 
 MIDDLEWARE = [
@@ -86,8 +88,12 @@ WSGI_APPLICATION = 'cryptoDashboard.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 
@@ -116,7 +122,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Calcutta'
 
 USE_I18N = True
 
@@ -139,9 +145,12 @@ AUTHENTICATION_BACKENDS = (
     'social_core.backends.github.GithubOAuth2',
     'social_core.backends.twitter.TwitterOAuth',
     'social_core.backends.facebook.FacebookOAuth2',
-
     'django.contrib.auth.backends.ModelBackend',
 )
+
+CRON_CLASSES = [
+    'crypto_currency.cron.UpdateCryptoCurrencyPricesCronJob',
+]
 
 LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
@@ -149,3 +158,6 @@ LOGIN_REDIRECT_URL = 'home'
 
 SOCIAL_AUTH_GITHUB_KEY = config('GITHUB_CLIENT_ID')
 SOCIAL_AUTH_GITHUB_SECRET = config('GITHUB_CLIENT_SECRET')
+
+SOCIAL_AUTH_FACEBOOK_KEY = config('FACEBOOK_CLIENT_ID')
+SOCIAL_AUTH_FACEBOOK_SECRET = config('FACEBOOK_CLIENT_SECRET')

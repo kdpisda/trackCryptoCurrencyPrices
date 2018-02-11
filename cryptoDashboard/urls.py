@@ -25,6 +25,8 @@ urlpatterns = [
     url(r'^login/$', auth_views.login, name='login'),
     url(r'^logout/$', auth_views.logout, name='logout'),
     url(r'^oauth/', include('social_django.urls', namespace='social')),
+    url(r'^api/v1/', include('api.urls', namespace='api')),
+    url(r'^live/$', dashboard_views.live_prices, name='live_prices'),
     url(r'^$', dashboard_views.home, name='home'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
